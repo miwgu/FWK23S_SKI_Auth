@@ -9,14 +9,14 @@ const router = express.Router();
 const secretKey = process.env.SECRET_KEY;
 //skriver ut secret key
 console.log(`SecretKey: ${secretKey}`);
-//skriver ut en random hex sträng
-app.use(crypto.randomBytes(64).toString('hex'));
 
-// Fördefinierade användare
+require('dotenv').config();
+
+// Fördefinierade användare men skriver inte lösenord och användanamn i koden utan i .env filen som döljs i .gitignore
 const users = [
-  { email: "user@example.com", password: "password" },
-  { email: "other@example.com", password: "password" },
-  { email: "admin@example.com", password: "password" },
+  { email: process.env.USER1_EMAIL, password: process.env.USER1_PASSWORD },
+  { email: process.env.USER2_EMAIL, password: process.env.USER2_PASSWORD },
+  { email: process.env.ADMIN_EMAIL, password: process.env.ADMIN_PASSWORD },
 ];
 
 /**
