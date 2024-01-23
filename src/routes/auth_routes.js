@@ -3,6 +3,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 //importerar crypto
 const crypto = require('crypto');
+const bcrypt = require('bcrypt'); // för att hasha lösenord
 //skapar en router
 const router = express.Router();
 //hämtar secret key från .env filen
@@ -12,11 +13,13 @@ console.log(`SecretKey: ${secretKey}`);
 
 require('dotenv').config();
 
+
+
 // Fördefinierade användare men skriver inte lösenord och användanamn i koden utan i .env filen som döljs i .gitignore
 const users = [
-  { email: process.env.USER1_EMAIL, password: process.env.USER1_PASSWORD },
-  { email: process.env.USER2_EMAIL, password: process.env.USER2_PASSWORD },
-  { email: process.env.ADMIN_EMAIL, password: process.env.ADMIN_PASSWORD },
+  { email: process.env.USER1_EMAIL, passwordHash: process.env.USER1_PASSWORD_HASH },
+  { email: process.env.USER2_EMAIL, passwordHash: process.env.USER2_PASSWORD_HASH },
+  { email: process.env.ADMIN_EMAIL, passwordHash: process.env.ADMIN_PASSWORD_HASH },
 ];
 
 /**
@@ -28,9 +31,14 @@ const users = [
 
 //kollar om användaren är giltig genom att jämföra e-post och lösenord
 function isValidUser(email, password) {
-  return users.some(user => user.email === email && user.password === password);
+  const user = users.find(user => user.email === email);
+  if (!user) {
+    return false; // Användaren finns inte
+  }
+  
+  // Jämför det inkommande lösenordet med det hashade lösenordet
+  return bcrypt.compareSync(password, user.passwordHash);
 }
-
 /**
  * Hämtar användarens roll baserat på e-postadressen.
  * @param {string} email Användarens e-post.
