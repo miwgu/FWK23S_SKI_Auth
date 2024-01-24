@@ -47,12 +47,25 @@ function getUserRole(email) {
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
 
-  // Kontrollera om användaren är giltig och sätt en gräns för giltighetstiden på 1 timme
-  if (isValidUser(email, password)) {
+  // Check if the user is valid and set the expiration time based on the user role
+    if (isValidUser(email, password)) {
+      const userRole = getUserRole(email);
+      let expirationTime;
+
+    // Set expiration time based on user role
+      if (userRole === 'admin') {
+      // Admin users have a 1-hour expiration time
+      expirationTime = 60 * 60; // 1 hour in seconds
+    } else {
+      // Regular users have a 30-secound expiration time.
+      expirationTime = 30; // 30 secound.
+      }
+
+    // Create payload with user information and expiration time
     const payload = {
       email,
-      role: getUserRole(email),
-      exp: Math.floor(Date.now() / 1000) + (60 * 60) // 1 timme (3600 sekunder)
+      role: userRole,
+      exp: Math.floor(Date.now() / 1000) + expirationTime,
     };
   
   // Skapa och signera JWT med vår hemliga nyckel och skicka tillbaka den som JSON
