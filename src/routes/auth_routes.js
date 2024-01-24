@@ -1,19 +1,16 @@
 const express = require('express');
 //importerar jwt
 const jwt = require('jsonwebtoken');
-//importerar crypto
+//importerar crypto för att skapa en secret key
 const crypto = require('crypto');
-const bcrypt = require('bcrypt'); // för att hasha lösenord
+//importerar bcrypt för att hasha lösenord
+const bcrypt = require('bcrypt'); 
 //skapar en router
 const router = express.Router();
 //hämtar secret key från .env filen
 const secretKey = process.env.SECRET_KEY;
-//skriver ut secret key
-console.log(`SecretKey: ${secretKey}`);
 
 require('dotenv').config();
-
-
 
 // Fördefinierade användare men skriver inte lösenord och användanamn i koden utan i .env filen som döljs i .gitignore
 const users = [
