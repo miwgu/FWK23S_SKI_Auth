@@ -1,8 +1,6 @@
 const express = require('express');
 //importerar jwt
 const jwt = require('jsonwebtoken');
-//importerar crypto för att skapa en secret key
-const crypto = require('crypto');
 //importerar bcrypt för att hasha lösenord
 const bcrypt = require('bcrypt'); 
 //skapar en router
