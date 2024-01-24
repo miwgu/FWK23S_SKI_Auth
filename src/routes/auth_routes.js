@@ -1,3 +1,4 @@
+const fs = require('fs').promises;
 const express = require('express');
 //importerar jwt
 const jwt = require('jsonwebtoken');
@@ -9,13 +10,13 @@ const router = express.Router();
 const secretKey = process.env.SECRET_KEY;
 
 require('dotenv').config();
-
+// Vi har users.json
 // Fördefinierade användare men skriver inte lösenord och användanamn i koden utan i .env filen som döljs i .gitignore
-const users = [
+/*const users = [
   { email: process.env.USER1_EMAIL, passwordHash: process.env.USER1_PASSWORD_HASH },
   { email: process.env.USER2_EMAIL, passwordHash: process.env.USER2_PASSWORD_HASH },
   { email: process.env.ADMIN_EMAIL, passwordHash: process.env.ADMIN_PASSWORD_HASH },
-];
+];*/
 
 /**
  * parameter email används för att jämföra med användarens e-post och parameter password används för att jämföra med användarens lösenord.
@@ -25,15 +26,26 @@ const users = [
  */
 
 //kollar om användaren är giltig genom att jämföra e-post och lösenord
-function isValidUser(email, password) {
-  const user = users.find(user => user.email === email);
-  if (!user) {
-    return false; // Användaren finns inte
-  }
+// pausa exekveringen av den funktionen själv tills promise(await) är löst och hämta resultatet av promise(await).
+async function isValidUser(email, password) {
   
-  // Jämför det inkommande lösenordet med det hashade lösenordet
-  return bcrypt.compareSync(password, user.passwordHash);
-}
+  try{
+    const usersJson = await fs.readFile('./data/users.json', 'utf-8'); // Den operation(promise) måste fullfilt först för att köra funktionen
+    const users = JSON.parse(usersJson);
+    console.log('users: ', users);
+    //Kontrollera först om e-mail finns i json
+  const user = users.find(user => user.email === email);
+  if (user) {
+    // Jämför det inkommande lösenordet med det hashade lösenordet
+    const passMatch = bcrypt.compareSync(password, user.passwordHash);
+    return passMatch;
+  }
+  } catch (error){
+    console.error('Error reading or parsing users.json', error);
+    return false;
+  }
+  return false;
+};
 /**
  * Hämtar användarens roll baserat på e-postadressen.
  * @param {string} email Användarens e-post.
