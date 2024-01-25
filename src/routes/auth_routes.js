@@ -28,23 +28,31 @@ require('dotenv').config();
 //kollar om användaren är giltig genom att jämföra e-post och lösenord
 // pausa exekveringen av den funktionen själv tills promise(await) är löst och hämta resultatet av promise(await).
 async function isValidUser(email, password) {
-  
-  try{
-    const usersJson = await fs.readFile('./data/users.json', 'utf-8'); // Den operation(promise) måste fullfilt först för att köra funktionen
+  try {
+    // Läs innehållet från filen './data/users.json' som en textsträng
+    const usersJson = await fs.readFile('./data/users.json', 'utf-8');
+    
+    // Konvertera den lästa JSON-strängen till ett JavaScript-objekt (användarlista)
     const users = JSON.parse(usersJson);
-    //Kontrollera först om e-mail finns i json
-  const user = users.find(user => user.email === email);
-  if (user) {
-    // Jämför det inkommande lösenordet med det hashade lösenordet
-    const passMatch = bcrypt.compareSync(password, user.passwordHash);
-    return passMatch;
-  }
-  } catch (error){
+
+    // Kontrollera om användaren med den angivna e-postadressen finns i användarlistan
+    const user = users.find(user => user.email === email);
+
+    if (user) {
+      // Om användaren hittas, jämför det inkommande lösenordet med det hashade lösenordet
+      const passMatch = bcrypt.compareSync(password, user.passwordHash);
+      return passMatch;
+    }
+  } catch (error) {
+    // Hantera fel som kan uppstå under inläsningen eller tolkningen av JSON-filen
     console.error('Error reading or parsing users.json', error);
     return false;
   }
+
+  // Om användaren inte hittades eller om det uppstod något fel, returnera false som standardvärde
   return false;
 };
+
 /**
  * Hämtar användarens roll baserat på e-postadressen.
  * @param {string} email Användarens e-post.
