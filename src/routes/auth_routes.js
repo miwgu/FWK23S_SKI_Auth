@@ -10,7 +10,7 @@ const router = express.Router();
 const secretKey = process.env.SECRET_KEY;
 
 require('dotenv').config();
-// Vi har users.json
+// Vi har users.json(fake-database)
 // Fördefinierade användare men skriver inte lösenord och användanamn i koden utan i .env filen som döljs i .gitignore
 /*const users = [
   { email: process.env.USER1_EMAIL, passwordHash: process.env.USER1_PASSWORD_HASH },
@@ -32,7 +32,6 @@ async function isValidUser(email, password) {
   try{
     const usersJson = await fs.readFile('./data/users.json', 'utf-8'); // Den operation(promise) måste fullfilt först för att köra funktionen
     const users = JSON.parse(usersJson);
-    console.log('users: ', users);
     //Kontrollera först om e-mail finns i json
   const user = users.find(user => user.email === email);
   if (user) {
