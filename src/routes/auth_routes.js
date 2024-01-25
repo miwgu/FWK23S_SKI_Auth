@@ -11,12 +11,6 @@ const secretKey = process.env.SECRET_KEY;
 
 require('dotenv').config();
 // Vi har users.json(fake-database)
-// Fördefinierade användare men skriver inte lösenord och användanamn i koden utan i .env filen som döljs i .gitignore
-/*const users = [
-  { email: process.env.USER1_EMAIL, passwordHash: process.env.USER1_PASSWORD_HASH },
-  { email: process.env.USER2_EMAIL, passwordHash: process.env.USER2_PASSWORD_HASH },
-  { email: process.env.ADMIN_EMAIL, passwordHash: process.env.ADMIN_PASSWORD_HASH },
-];*/
 
 /**
  * parameter email används för att jämföra med användarens e-post och parameter password används för att jämföra med användarens lösenord.
