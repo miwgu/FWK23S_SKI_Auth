@@ -60,21 +60,21 @@ function getUserRole(email) {
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
 
-  // Check if the user is valid and set the expiration time based on the user role
+  // om användaren är giltig skapas en payload med användarinformation och expiration time
     if (isValidUser(email, password)) {
       const userRole = getUserRole(email);
       let expirationTime;
 
-    // Set expiration time based on user role
+    // sätter en expiration time baserat på användarens roll
       if (userRole === 'admin') {
-      // Admin users have a 1-hour expiration time
+      // Admins har en 1-timmes expiration time.
       expirationTime = 60 * 60; // 1 hour in seconds
     } else {
-      // Regular users have a 30-secound expiration time.
+      // vanliga användare har en 30-sekunders expiration time.
       expirationTime = 30; // 30 secound.
       }
 
-    // Create payload with user information and expiration time
+    // aktiverar jwt.sign() funktionen för att skapa en JWT med payload, secret key och expiration time
     const payload = {
       email,
       role: userRole,
