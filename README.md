@@ -27,7 +27,7 @@ Vi har installerat helmet och använt det i vår server.js för att undvika atta
 1. Frontend skickar credential (e-mail, lösenord) till Auth 
 2. Auth kollar på inlogning uppgifter i users.json.Loggin Lyckas.
 3. Auth utfäder JWT med SECRET_KEY och skicka de till Frontend
-4. Frontend spara JWT i LocalStrage.
+4. Frontend sparar JWT i LocalStrage.
 5. Grontend Skickar request med JWT i header till Backend -> headers: { Authorization: `Bearer ${token}` }
 6. Backend verify JWT och
 7. Backend kollar på rollen, admin eller user i payload
