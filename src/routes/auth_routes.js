@@ -12,6 +12,35 @@ const secretKey = process.env.SECRET_KEY;
 require('dotenv').config();
 // Vi har users.json(fake-database)
 
+const { USER1_EMAIL, USER1_PASSWORD_HASH, USER2_EMAIL, USER2_PASSWORD_HASH, ADMIN_EMAIL, ADMIN_PASSWORD_HASH } = process.env;
+
+//Läser in Json fil
+// pausa exekveringen av den funktionen själv tills promise(await) är löst och hämta resultatet av promise(await).
+//I JavaScript omsluts ett reguljärt uttryck av snedstreck (/). Flaggan g i slutet av det reguljära uttrycket står för "global". Det matchar alla förekomster av mönstret i inmatningssträngen, snarare än bara den första.
+async function readUsersJson() {
+  try {
+    const usersJson = await fs.readFile('./data/users.json', 'utf-8');
+    const replacedJson = usersJson
+      .replace(/\${USER1_EMAIL}/g, USER1_EMAIL)
+      .replace(/\${USER1_PASSWORD_HASH}/g, USER1_PASSWORD_HASH)
+      .replace(/\${USER2_EMAIL}/g, USER2_EMAIL)
+      .replace(/\${USER2_PASSWORD_HASH}/g, USER2_PASSWORD_HASH)
+      .replace(/\${ADMIN_EMAIL}/g, ADMIN_EMAIL)
+      .replace(/\${ADMIN_PASSWORD_HASH}/g, ADMIN_PASSWORD_HASH);
+
+    const usersData = JSON.parse(replacedJson);
+    return usersData.users;
+  } catch (error) {
+    console.error('Error reading or parsing users.json:', error);
+    return [];
+  }
+}
+
+// Skriva users log in Bash 
+readUsersJson()
+  .then(users => console.log("USERS",users))
+  .catch(error => console.error('Error reading users.json:', error));
+
 /**
  * parameter email används för att jämföra med användarens e-post och parameter password används för att jämföra med användarens lösenord.
  * @param {string} email Användarens e-post.
@@ -20,32 +49,34 @@ require('dotenv').config();
  */
 
 //kollar om användaren är giltig genom att jämföra e-post och lösenord
-// pausa exekveringen av den funktionen själv tills promise(await) är löst och hämta resultatet av promise(await).
 async function isValidUser(email, password) {
   try {
-    // Läs innehållet från filen './data/users.json' som en textsträng
-    const usersJson = await fs.readFile('./data/users.json', 'utf-8');
-    
-    // Konvertera den lästa JSON-strängen till ett JavaScript-objekt (användarlista)
-    const users = JSON.parse(usersJson);
+    // Read users data from users.json
+    const users = await readUsersJson();
 
-    // Kontrollera om användaren med den angivna e-postadressen finns i användarlistan
+    // Find the user with the provided email
     const user = users.find(user => user.email === email);
-
     if (user) {
-      // Om användaren hittas, jämför det inkommande lösenordet med det hashade lösenordet
+      // Compare the provided password with the passwordHash of the user
       const passMatch = bcrypt.compareSync(password, user.passwordHash);
-      return passMatch;
+      if (passMatch) {
+        // Passwords match, return true
+        return true;
+      } else {
+        // Passwords do not match, return false
+        console.log('Password does not match');
+        return false;
+      }
+    } else {
+      // If user with the provided email is not found, return false
+      console.log('User not found');
+      return false;
     }
   } catch (error) {
-    // Hantera fel som kan uppstå under inläsningen eller tolkningen av JSON-filen
-    console.error('Error reading or parsing users.json', error);
+    console.error('Error validating user:', error);
     return false;
   }
-
-  // Om användaren inte hittades eller om det uppstod något fel, returnera false som standardvärde
-  return false;
-};
+}
 
 /**
  * Hämtar användarens roll baserat på e-postadressen.
@@ -57,11 +88,11 @@ function getUserRole(email) {
 }
 
 // Login route med JWT som skickas tillbaka som JSON
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  // om användaren är giltig skapas en payload med användarinformation och expiration time
-    if (isValidUser(email, password)) {
+   // om användaren är giltig skapas en payload med användarinformation och expiration time
+    if (await isValidUser(email, password)) {
       const userRole = getUserRole(email);
       let expirationTime;
 
@@ -95,4 +126,3 @@ router.post('/login', (req, res) => {
 
 // Exportera modulen för att kunna användas av andra moduler (t.ex. server.js) via require() funktionen 
 module.exports = router;
-
