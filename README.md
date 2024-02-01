@@ -16,8 +16,6 @@ alla andra kan bara stanna i 30 sekunder.
 ##   users.json
 Vi har använt en .json fil för att skapa vår fejkade databas där alla användare och lösenord finns. De döljas i vår .env fil (inga lösenord eller användarnan står i klartext i vår databas)
 
-Det används en jsonwebtoken (jwt) När vi loggar in skickas en post request till auth som skickar tillbaka en token till servern. Sedan skickas den token till backennd för att se om vi är admin eller annan som får tillgång till vår data. 
-
 ##   Saltade lösenord
 Vi har installerat bcrypt som är en krypteringsalgoritm som används för att kryptera lösenord. Den genererar en slumpmässig sträng (salt) som läggs till lösenordet innan krypteringen utförs.
 ("Saltade lösenord"). Användningen av saltning i bcrypt är effektivt mot rainbow table-attacker.
